@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 // const API_URL = "http://localhost:5010/api/todos"; // Postgres
 //const API_URL = "https://localhost:5159/api/todos"; // Mongo
-const API_URL = "http://localhost:5001/api/todos"; // docker Postgres API
+//const API_URL = "http://localhost:5001/api/todos"; // docker Postgres API
+const API_URL = "https://todo-fullstack-docker.onrender.com/api/todos"; // Render Postgres API
 
 export default function App() {
   const [text, setText] = useState("");
