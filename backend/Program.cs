@@ -40,6 +40,11 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
+var urls = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(urls))
+{
+    builder.WebHost.UseUrls($"http://*:{urls}");
+}
 
 var app = builder.Build();
 
