@@ -6,6 +6,12 @@ using TodoApi.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://*:{port}");
+}
+
 // --------------------
 // Add Services
 // --------------------
@@ -18,8 +24,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // DbContext
+var conn =
+    builder.Configuration.GetConnectionString("Postgres")
+    ?? builder.Configuration["ConnectionStrings__Postgres"]
+    ?? builder.Configuration["DATABASE_URL"];
+
+if (string.IsNullOrWhiteSpace(conn))
+{
+    throw new Exception("Postgres connection string not configured");
+}
+
 builder.Services.AddDbContext<TodoDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+    options.UseNpgsql(conn));
 
 // Dependency Injection
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
@@ -34,17 +50,13 @@ builder.Services.AddCors(options =>
                 "http://localhost:5173",
                 "https://localhost:5173",
                 "https://localhost:3000",
-                "http://localhost:3000"
+                "http://localhost:3000",
+                "https://todo-ui-xxxx.vercel.app"   // 🔴 replace with your real Vercel URL
             )
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
 
-var urls = Environment.GetEnvironmentVariable("PORT");
-if (!string.IsNullOrEmpty(urls))
-{
-    builder.WebHost.UseUrls($"http://*:{urls}");
-}
 
 var app = builder.Build();
 
@@ -60,11 +72,11 @@ using (var scope = app.Services.CreateScope())
 // --------------------
 
 // Swagger (enable always or only in development)
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 // Use CORS (IMPORTANT: before MapControllers)
 app.UseCors("FrontendPolicy");
