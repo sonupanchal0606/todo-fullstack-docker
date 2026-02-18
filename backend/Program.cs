@@ -24,7 +24,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // DbContext
-var conn =
+string? conn =
     builder.Configuration.GetConnectionString("Postgres")
     ?? builder.Configuration["ConnectionStrings__Postgres"]
     ?? builder.Configuration["DATABASE_URL"];
@@ -34,8 +34,24 @@ if (string.IsNullOrWhiteSpace(conn))
     throw new Exception("Postgres connection string not configured");
 }
 
+// ✅ Convert Render postgres:// URL to Npgsql format if needed
+if (conn.StartsWith("postgres://") || conn.StartsWith("postgresql://"))
+{
+    var uri = new Uri(conn);
+    var userInfo = uri.UserInfo.Split(':', 2);
+
+    conn =
+        $"Host={uri.Host};" +
+        $"Port={uri.Port};" +
+        $"Database={uri.AbsolutePath.TrimStart('/')};" +
+        $"Username={userInfo[0]};" +
+        $"Password={userInfo[1]};" +
+        $"Ssl Mode=Require;Trust Server Certificate=true";
+}
+
 builder.Services.AddDbContext<TodoDbContext>(options =>
     options.UseNpgsql(conn));
+
 
 // Dependency Injection
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
