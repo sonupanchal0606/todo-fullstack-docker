@@ -34,15 +34,16 @@ if (string.IsNullOrWhiteSpace(conn))
     throw new Exception("Postgres connection string not configured");
 }
 
-// ✅ Convert Render postgres:// URL to Npgsql format if needed
 if (conn.StartsWith("postgres://") || conn.StartsWith("postgresql://"))
 {
     var uri = new Uri(conn);
     var userInfo = uri.UserInfo.Split(':', 2);
 
+    var port_ = uri.Port > 0 ? uri.Port : 5432; // ✅ default if missing
+
     conn =
         $"Host={uri.Host};" +
-        $"Port={uri.Port};" +
+        $"Port={port_};" +
         $"Database={uri.AbsolutePath.TrimStart('/')};" +
         $"Username={userInfo[0]};" +
         $"Password={userInfo[1]};" +
