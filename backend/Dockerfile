@@ -1,18 +1,27 @@
 # Step 1: Build the app
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build   # get .NET build tools
-WORKDIR /src                                     # set working folder
+# get .NET build tools
+# set working folder
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build   
+WORKDIR /src                                     
 
-COPY . .                                         # copy your source code
-RUN dotnet restore                               # restore NuGet packages
-RUN dotnet publish -c Release -o /app/publish    # build your API
+# copy your source code
+# restore NuGet packages
+# build your API
+COPY . .                                         
+RUN dotnet restore                             
+RUN dotnet publish -c Release -o /app/publish   
 
 # Step 2: Run the app
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.        # runtime-only image
+# runtime-only image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.        
 WORKDIR /app
 
-COPY --from=build /app/publish .                 # copy built files
+# copy built files
+COPY --from=build /app/publish .                 
 
-ENV ASPNETCORE_URLS=http://+:8080                # app listens on 8080
+# app listens on 8080
+ENV ASPNETCORE_URLS=http://+:8080                
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "TodoApi.dll"]             # start your API
+# start your API
+ENTRYPOINT ["dotnet", "TodoApi.dll"]             
