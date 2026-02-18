@@ -68,7 +68,7 @@ builder.Services.AddCors(options =>
                 "https://localhost:5173",
                 "https://localhost:3000",
                 "http://localhost:3000",
-                "https://todo-ui-xxxx.vercel.app"   // 🔴 replace with your real Vercel URL
+                "https://todo-frontend-docker.vercel.app"   // 🔴 replace with your real Vercel URL
             )
             .AllowAnyHeader()
             .AllowAnyMethod());
@@ -78,7 +78,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Apply Migrations Automatically on App Startup
-using (var scope = app.Services.CreateScope()) 
+using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<TodoDbContext>();
     db.Database.Migrate();
@@ -91,8 +91,8 @@ using (var scope = app.Services.CreateScope())
 // Swagger (enable always or only in development)
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 //}
 
 // Use CORS (IMPORTANT: before MapControllers)
